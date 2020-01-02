@@ -1,6 +1,13 @@
 import functools
-from config import config
 import requests
+import logging
+
+from config import config
+
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    level=logging.INFO
+                    )
+logger = logging.getLogger(__name__)
 
 
 def guarantee_token(f):
@@ -8,7 +15,10 @@ def guarantee_token(f):
     Gets token from API if it is not already stored in context.user_data['token'] """
     @functools.wraps(f)
     def inner(update, context):
+
         if not context.user_data.get('token'):
+            print("There was no token")
+            logger.info("There was no token")
             username = update.effective_user.full_name
             telegram_id = update.effective_user.id
             url = config['api_url'] + '/clerks/register-and-login'
@@ -20,5 +30,6 @@ def guarantee_token(f):
             res_json = requests.post(url, json=payload).json()
             context.user_data['token'] = res_json.get('token')
             context.user_data['username'] = username
-            return f(update, context)
+        return f(update, context)
+
     return inner
