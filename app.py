@@ -1,33 +1,36 @@
 import logging
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
-from marshmallow import pprint
-import json
-import handlers
+
+from telegram.ext import Updater
+
 from config import config
-from conversations import name_line_conversation_handler, manage_lines_conversation_handler
+import handlers
+import helpers
+import conversations
+
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO
                     )
 logger = logging.getLogger(__name__)
 
-token = config['bot_token']
-# bot = telegram.Bot(token=token)
-# # print(bot.get_me())
 
+token = config['bot_token']
 updater = Updater(token=token, use_context=True)
-updater.start_polling()
 
 dispatcher = updater.dispatcher
 
 
-start_handler = CommandHandler('start', handlers.start)
-dispatcher.add_handler(start_handler)
+dispatcher.add_handler(handlers.start_handler)
 
-other_handler = CommandHandler('other', handlers.other)
-dispatcher.add_handler(other_handler)
+dispatcher.add_handler(handlers.other_handler)
 
-# create_line_prompt_handler = MessageHandler(Filters.regex(r'Create new line ➕'), handlers.create_line_prompt)
-# dispatcher.add_handler(create_line_prompt_handler)
+dispatcher.add_handler(handlers.test_handler)
 
-dispatcher.add_handler(name_line_conversation_handler)
-dispatcher.add_handler(manage_lines_conversation_handler)
+
+dispatcher.add_handler(conversations.name_line_conversation_handler)
+
+dispatcher.add_handler(conversations.manage_lines_conversation_handler)
+
+dispatcher.add_error_handler(helpers.error)
+
+updater.start_polling()
+updater.idle()

@@ -1,9 +1,12 @@
 import requests
-from telegram import ReplyKeyboardMarkup, InlineKeyboardMarkup, InlineKeyboardButton, KeyboardButton, ReplyKeyboardRemove
+from telegram import InlineKeyboardMarkup, InlineKeyboardButton, KeyboardButton, ReplyKeyboardRemove
+from telegram.ext import CommandHandler
 
 from config import config
 from helpers import guarantee_token
 from keyboards import main_keyboard
+
+# Start handler
 
 
 @guarantee_token
@@ -13,6 +16,11 @@ def start(update, context):
     context.bot.send_message(chat_id=update.effective_user.id, text=reply, reply_markup=main_keyboard)
 
 
+start_handler = CommandHandler('start', start)
+
+# Other handler
+
+
 @guarantee_token
 def other(update, context):
     update.message.reply_text('I see! Please send me a photo of yourself, '
@@ -20,6 +28,19 @@ def other(update, context):
                               reply_markup=ReplyKeyboardRemove())
 
 
+other_handler = CommandHandler('other', other)
+
+
+# Test handler
 @guarantee_token
-def create_line_prompt(update, context):
-    context.bot.send_message(chat_id=update.effective_user.id, text="How do you want your new line to be named?")
+def test(update, context):
+    update.message.reply_text('Keyboard',
+                              reply_markup=ReplyKeyboardRemove())
+
+
+test_handler = CommandHandler('test', test)
+
+
+# @guarantee_token
+# def create_line_prompt(update, context):
+#     context.bot.send_message(chat_id=update.effective_user.id, text="How do you want your new line to be named?")

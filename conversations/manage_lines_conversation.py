@@ -8,12 +8,9 @@ from config import config
 from helpers import guarantee_token
 from keyboards import main_keyboard
 
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
-
 logger = logging.getLogger(__name__)
 
-CHOOSE_LINE = range(1)
+CHOOSE_LINE, CALL_NEXT = range(2)
 
 
 @guarantee_token
@@ -26,7 +23,7 @@ def display_lines(update, context):
     lines_full = res.json()
     lines_names = [x['name'] for x in lines_full]
 
-    buttons = [[KeyboardButton(x)] for x in lines_names] + [[KeyboardButton("🔙 Back")]]
+    buttons = [[KeyboardButton(x)] for x in lines_names] + [[KeyboardButton("🔙")]]
     keyboard = ReplyKeyboardMarkup(buttons, resize_keyboard=True)
 
     update.message.reply_text("Here are your lines. Choose which one to manage:", reply_markup=keyboard)
@@ -34,7 +31,8 @@ def display_lines(update, context):
 
 
 @guarantee_token
-def validate_name(update, context):
+def choose_line(update, context):
+    logger.debug("CCCCCCHHHHHOOOOSSSSEEEE LLLLIIIIINNNNEEEEE!!!!!!!!")
     line_name = update.message.text
     url = config['api_url'] + '/clerks/create-line'
     headers = {"Authorization": "Bearer " + context.user_data.get('token')}
@@ -54,6 +52,13 @@ def validate_name(update, context):
         return ConversationHandler.END
 
 
+def back(update, context):
+    update.message.reply_text(
+        "Choose an action:",
+        reply_markup=main_keyboard)
+    return ConversationHandler.END
+
+
 def cancel(update, context):
     update.message.reply_text('Line creation aborted.',
                               reply_markup=ReplyKeyboardRemove())
@@ -65,7 +70,10 @@ manage_lines_conversation_handler = ConversationHandler(
     entry_points=[MessageHandler(Filters.regex(r"My lines 📋"), display_lines)],
 
     states={
-        CHOOSE_LINE: [MessageHandler(Filters.text, validate_name)],
+        CHOOSE_LINE: [
+            MessageHandler(Filters.regex(r"🔙"), back),
+            MessageHandler(Filters.text, choose_line),
+        ],
     },
 
     fallbacks=[CommandHandler('cancel', cancel)]
