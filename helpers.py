@@ -15,7 +15,6 @@ def guarantee_token(f):
     def inner(update, context):
 
         if not context.user_data.get('token'):
-            print("There was no token")
             logger.info("There was no token")
             username = update.effective_user.full_name
             telegram_id = update.effective_user.id

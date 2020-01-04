@@ -26,11 +26,11 @@ dispatcher.add_handler(handlers.other_handler)
 dispatcher.add_handler(handlers.test_handler)
 
 
-dispatcher.add_handler(conversations.name_line_conversation_handler)
+dispatcher.add_handler(conversations.create_line_conversation_handler)
 
 dispatcher.add_handler(conversations.manage_lines_conversation_handler)
 
 dispatcher.add_error_handler(helpers.error)
 
 updater.start_polling()
-updater.idle()
+# updater.idle()

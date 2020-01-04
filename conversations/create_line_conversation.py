@@ -18,7 +18,7 @@ NAME_LINE = range(1)
 
 def create_line_prompt(update, context):
     update.message.reply_text("How do you want your new line to be named?\n"
-                              "If you don't want to create new line type //cancel", reply_markup=ReplyKeyboardRemove())
+                              "If you don't want to create new line type /cancel", reply_markup=ReplyKeyboardRemove())
     return NAME_LINE
 
 
@@ -45,12 +45,12 @@ def validate_name(update, context):
 
 def cancel(update, context):
     update.message.reply_text('Line creation cancelled.',
-                              reply_markup=ReplyKeyboardRemove())
+                              reply_markup=main_keyboard)
 
     return ConversationHandler.END
 
 
-name_line_conversation_handler = ConversationHandler(
+create_line_conversation_handler = ConversationHandler(
     entry_points=[MessageHandler(Filters.regex(r'Create new line ➕'), create_line_prompt)],
 
     states={
